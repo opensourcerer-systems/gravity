@@ -55,7 +55,7 @@ function build_upgrade_step {
   local service_opts='"service_uid":997,"service_gid":994' # see issue #1279
   local suite=''
   suite+=$(cat <<EOF
- upgrade={${cluster_size},${service_opts},"os":"${os}","storage_driver":"${storage_driver}","from":"/telekube_${release}.tar"}
+ upgrade3lts={${cluster_size},${service_opts},"os":"${os}","storage_driver":"${storage_driver}","from":"/telekube_${release}.tar"}
 EOF
 )
   echo $suite
