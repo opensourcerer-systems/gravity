@@ -49,7 +49,7 @@ export REPEAT_TESTS=${REPEAT_TESTS:-1}
 
 function build_resize_suite {
   cat <<EOF
- resize={"to":3,"flavor":"one","nodes":1,"role":"node","state_dir":"/var/lib/telekube","os":"ubuntu:16","storage_driver":"overlay2"}
+ resize={"to":3,"flavor":"one","nodes":1,"role":"node","state_dir":"/var/lib/telekube","os":"suse:15","storage_driver":"overlay2"}
 EOF
 }
 
@@ -82,7 +82,7 @@ function build_upgrade_suite {
 
 function build_ops_install_suite {
   local suite=$(cat <<EOF
- install={"installer_url":"/installer/opscenter.tar","nodes":1,"flavor":"standalone","role":"node","os":"ubuntu:16","ops_advertise_addr":"example.com:443"}
+ install={"installer_url":"/installer/opscenter.tar","nodes":1,"flavor":"standalone","role":"node","os":"suse:15","ops_advertise_addr":"example.com:443"}
 EOF
 )
   echo $suite
@@ -90,7 +90,7 @@ EOF
 
 function build_install_suite {
   local suite=''
-  local test_os="redhat:7"
+  local test_os="suse:15"
   local cluster_size='"flavor":"three","nodes":3,"role":"node"'
   suite+=$(cat <<EOF
  install={${cluster_size},"os":"${test_os}","storage_driver":"overlay2"}
