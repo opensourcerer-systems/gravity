@@ -84,9 +84,9 @@ nodeProfiles:
         - name: debian
           versions: ["8", "9"]
         - name: suse
-          versions: ["12"]
+          versions: ["12", "15"]
         - name: sles  # Suse Linux Enterprise Server
-          versions: ["12"]
+          versions: ["12", "15"]
         - name: amz
           versions: ["2"]
       volumes:
@@ -122,9 +122,9 @@ nodeProfiles:
         - name: debian
           versions: ["8", "9"]
         - name: suse
-          versions: ["12"]
+          versions: ["12", "15"]
         - name: sles  # Suse Linux Enterprise Server
-          versions: ["12"]
+          versions: ["12", "15"]
         - name: amz
           versions: ["2"]
       volumes:
@@ -165,9 +165,9 @@ nodeProfiles:
         - name: debian
           versions: ["8", "9"]
         - name: suse
-          versions: ["12"]
+          versions: ["12", "15"]
         - name: sles  # Suse Linux Enterprise Server
-          versions: ["12"]
+          versions: ["12", "15"]
         - name: amz
           versions: ["2"]
       volumes:
