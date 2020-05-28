@@ -210,8 +210,8 @@ In this case the response HTTP status code will be `503 Service Unavailable`.
 
 ### Cluster Status History
 
-Running `gravity status history` displays the history of changes to the 
-Cluster status. 
+Running `gravity status history` displays the history of changes to the
+Cluster status.
 
 Example output may look something like the following:
 
@@ -251,7 +251,7 @@ key specifies the name of the node (node-1, node-2, node-3).
 key specifies the name of the health check (time-drift, kube-apiserver).
 
 The `gravity status history` command is available on all `master` nodes of the
-cluster and provides an eventually consistent history between nodes. 
+cluster and provides an eventually consistent history between nodes.
 
 ## Application Status
 
@@ -470,7 +470,64 @@ root$ ./gravity plan resume
 root$ ./gravity agent shutdown
 ```
 
-## Direct Upgrades From Older LTS Versions
+### Rolling Back a Failed Upgrade
+
+When an automatic upgrade procedure encounters an error, it stops and lets the
+user decide on how to proceed: attempt to resolve the error and resume the
+upgrade, or rollback the operation and return the cluster to the original state.
+
+To rollback a failed upgrade operation, Gravity provides a `gravity rollback`
+command:
+
+```bsh
+$ sudo ./gravity rollback
+You are about to rollback the following operation:
+Type                 ID                                       State                  Created
+----                 --                                       -----                  -------
+operation_update     30c5d94c-1fbc-48eb-a952-a8632d519891     update_in_progress     2020-05-27 21:27
+
+Consider checking the operation plan and using --dry-run flag first to see which actions will be performed.
+You can suppress this warning in future by providing --confirm flag.
+Proceed? (yes/no):
+yes
+Rolling back "/masters/node-2/untaint" locally
+Rolling back "/masters/node-2/endpoints" locally
+Rolling back "/masters/node-2/uncordon" locally
+Rolling back "/masters/node-2/taint" locally
+Rolling back "/masters/node-2/health" on node node-2
+Rolling back "/masters/node-2/elect" on node node-2
+Rolling back "/masters/node-2/system-upgrade" on node node-2
+...
+```
+
+The command also supports dry-run mode that can be invoked prior to performing
+the actual rollback to see the actions that will be executed:
+
+```bsh
+$ sudo ./gravity rollback --dry-run
+[DRY-RUN] Rolling back "/masters/node-2/untaint" locally
+[DRY-RUN] Rolling back "/masters/node-2/endpoints" locally
+[DRY-RUN] Rolling back "/masters/node-2/uncordon" locally
+[DRY-RUN] Rolling back "/masters/node-2/taint" locally
+[DRY-RUN] Rolling back "/masters/node-2/health" on node node-2
+[DRY-RUN] Rolling back "/masters/node-2/elect" on node node-2
+[DRY-RUN] Rolling back "/masters/node-2/system-upgrade" on node node-2
+...
+```
+
+!!! note "Supported operations"
+    Currently, `gravity rollback` supports only the following operations:
+    upgrade, [runtime environment](config.md#runtime-environment-variables) update and
+    [cluster configuration](config.md#general-cluster-configuration) update.
+    Rollback of completed operation is not supported at the moment.
+
+If a more granular control over rollback/execution is needed - for example, rollback
+a specific part of the upgrade and retry it, Gravity provides a set of `gravity plan`
+subcommands for inspecting and interacting with the upgrade (or any other)
+operation plan. See the [Managing Operations](#managing-operations) section below
+for more details.
+
+## Multi-Hop Upgrades
 
 Gravity LTS releases are at most 8 months apart and are based on Kubernetes releases which are no more than 2 minor versions apart.
 This requirement is partially necessitated by the Kubernetes version skew [support policy](https://kubernetes.io/docs/setup/release/version-skew-policy/#supported-version-skew).
@@ -1178,7 +1235,7 @@ Signup token has been created and is valid for 1h0m0s hours. Share this URL with
 https://<host>/web/newuser/<token>
 ```
 
-!!! note 
+!!! note
     Make sure that `<host>` is accessible to the invited user.
 
 ### Reset User Password
@@ -1199,7 +1256,7 @@ Password reset token has been created and is valid for 1h0m0s. Share this URL wi
 https://<host>/web/reset/<token>
 ```
 
-!!! note 
+!!! note
     Make sure that `<host>` is accessible to the user.
 
 ## Securing a Cluster
