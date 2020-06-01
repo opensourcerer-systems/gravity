@@ -521,8 +521,7 @@ $ sudo ./gravity rollback --dry-run
     [cluster configuration](config.md#general-cluster-configuration) update.
     Rollback of completed operation is not supported at the moment.
 
-If a more granular control over rollback/execution is needed - for example, rollback
-a specific part of the upgrade and retry it, Gravity provides a set of `gravity plan`
+For a more granular control over rollback/execution, Gravity provides a set of `gravity plan`
 subcommands for inspecting and interacting with the upgrade (or any other)
 operation plan. See the [Managing Operations](#managing-operations) section below
 for more details.
