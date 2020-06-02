@@ -355,6 +355,7 @@ func Execute(g *Application, cmd string, extraArgs []string) error {
 		return updateTrigger(localEnv,
 			updateEnv,
 			*g.UpdateTriggerCmd.App,
+			*g.UpdateTriggerCmd.DockerDevice,
 			*g.UpdateTriggerCmd.Manual,
 			*g.UpdateTriggerCmd.SkipVersionCheck,
 		)
@@ -386,6 +387,7 @@ func Execute(g *Application, cmd string, extraArgs []string) error {
 		return updateTrigger(localEnv,
 			updateEnv,
 			*g.UpgradeCmd.App,
+			*g.UpgradeCmd.DockerDevice,
 			*g.UpgradeCmd.Manual,
 			*g.UpgradeCmd.SkipVersionCheck,
 		)

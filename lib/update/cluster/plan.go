@@ -56,6 +56,7 @@ func InitOperationPlan(
 	clusterEnv *localenv.ClusterEnvironment,
 	opKey ops.SiteOperationKey,
 	leader *storage.Server,
+	dockerDevice string,
 ) (*storage.OperationPlan, error) {
 	operation, err := storage.GetOperationByID(clusterEnv.Backend, opKey.OperationID)
 	if err != nil {
@@ -91,15 +92,16 @@ func InitOperationPlan(
 	}
 
 	plan, err = NewOperationPlan(ctx, PlanConfig{
-		Backend:   clusterEnv.Backend,
-		Apps:      clusterEnv.Apps,
-		Packages:  clusterEnv.ClusterPackages,
-		Client:    clusterEnv.Client,
-		DNSConfig: dnsConfig,
-		Operator:  clusterEnv.Operator,
-		Operation: (*ops.SiteOperation)(operation),
-		Leader:    leader,
-		Cluster:   *cluster,
+		Backend:      clusterEnv.Backend,
+		Apps:         clusterEnv.Apps,
+		Packages:     clusterEnv.ClusterPackages,
+		Client:       clusterEnv.Client,
+		DNSConfig:    dnsConfig,
+		Operator:     clusterEnv.Operator,
+		Operation:    (*ops.SiteOperation)(operation),
+		Leader:       leader,
+		Cluster:      *cluster,
+		DockerDevice: dockerDevice,
 	})
 	if err != nil {
 		return nil, trace.Wrap(err)
@@ -124,7 +126,7 @@ func NewOperationPlan(ctx context.Context, config PlanConfig) (*storage.Operatio
 		return nil, trace.Wrap(err)
 	}
 
-	servers, err = checkAndSetServerDefaults(servers, config.Client.CoreV1().Nodes())
+	servers, err = checkAndSetServerDefaults(servers, config.Client.CoreV1().Nodes(), config.DockerDevice)
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}
@@ -295,9 +297,11 @@ type PlanConfig struct {
 	Leader *storage.Server
 	// Cluster describes the installed cluster
 	Cluster ops.Site
+	//
+	DockerDevice string
 }
 
-func checkAndSetServerDefaults(servers []storage.Server, client corev1.NodeInterface) ([]storage.Server, error) {
+func checkAndSetServerDefaults(servers []storage.Server, client corev1.NodeInterface, dockerDevice string) ([]storage.Server, error) {
 	nodes, err := utils.GetNodes(client)
 	if err != nil {
 		return nil, trace.Wrap(err)
@@ -307,6 +311,10 @@ func checkAndSetServerDefaults(servers []storage.Server, client corev1.NodeInter
 	// set cluster role that might have not have been set
 L:
 	for i, server := range servers {
+		if dockerDevice != "" {
+			servers[i].Docker.Device.Name = storage.DeviceName(dockerDevice)
+		}
+
 		if utils.StringInSlice(masterIPs, server.AdvertiseIP) {
 			servers[i].ClusterRole = string(schema.ServiceRoleMaster)
 		} else {

@@ -57,10 +57,10 @@ func updateCheck(env *localenv.LocalEnvironment, updatePackage string) error {
 
 func updateTrigger(
 	localEnv, updateEnv *localenv.LocalEnvironment,
-	updatePackage string,
+	updatePackage, dockerDevice string,
 	manual, noValidateVersion bool,
 ) error {
-	updater, err := newClusterUpdater(context.TODO(), localEnv, updateEnv, updatePackage, manual, noValidateVersion)
+	updater, err := newClusterUpdater(context.TODO(), localEnv, updateEnv, updatePackage, dockerDevice, manual, noValidateVersion)
 	if err != nil {
 		return trace.Wrap(err)
 	}
@@ -76,11 +76,12 @@ func updateTrigger(
 func newClusterUpdater(
 	ctx context.Context,
 	localEnv, updateEnv *localenv.LocalEnvironment,
-	updatePackage string,
+	updatePackage, dockerDevice string,
 	manual, noValidateVersion bool,
 ) (updater, error) {
 	init := &clusterInitializer{
 		updatePackage: updatePackage,
+		dockerDevice:  dockerDevice,
 		unattended:    !manual,
 	}
 	updater, err := newUpdater(ctx, localEnv, updateEnv, init)
@@ -215,7 +216,26 @@ func (r *clusterInitializer) validatePreconditions(localEnv *localenv.LocalEnvir
 	if err != nil {
 		return trace.Wrap(err)
 	}
+	err = r.checkDockerDevice(cluster)
+	if err != nil {
+		return trace.Wrap(err)
+	}
 	r.updateLoc = updateApp.Package
+	return nil
+}
+
+func (r *clusterInitializer) checkDockerDevice(cluster ops.Site) error {
+	var nvmeServers storage.Servers
+	for _, server := range cluster.ClusterState.Servers {
+		if server.Docker.Device.IsNVMe() {
+			nvmeServers = append(nvmeServers, server)
+		}
+	}
+	if len(nvmeServers) > 0 && r.dockerDevice == "" {
+		return trace.BadParameter(`The following servers use NVMe device as their Docker device: %v
+Please provide --docker-device flag to update the Docker device during the upgrade.
+`, nvmeServers)
+	}
 	return nil
 }
 
@@ -237,7 +257,7 @@ func (r clusterInitializer) newOperationPlan(
 	leader *storage.Server,
 ) (*storage.OperationPlan, error) {
 	plan, err := clusterupdate.InitOperationPlan(
-		ctx, localEnv, updateEnv, clusterEnv, operation.Key(), leader,
+		ctx, localEnv, updateEnv, clusterEnv, operation.Key(), leader, r.dockerDevice,
 	)
 	if err != nil {
 		return nil, trace.Wrap(err)
@@ -282,6 +302,7 @@ func (r clusterInitializer) updateDeployRequest(req deployAgentsRequest) deployA
 type clusterInitializer struct {
 	updateLoc     loc.Locator
 	updatePackage string
+	dockerDevice  string
 	unattended    bool
 }
 

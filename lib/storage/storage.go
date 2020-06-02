@@ -1719,6 +1719,11 @@ func (r Device) String() string {
 		r.Name, r.Type, humanize.Bytes(r.SizeMB*1000000))
 }
 
+// IsNVMe returns true if this is an NVMe device.
+func (r Device) IsNVMe() bool {
+	return strings.HasPrefix(r.Path(), "/dev/nvme")
+}
+
 // DeviceType defines a device type
 type DeviceType string
 

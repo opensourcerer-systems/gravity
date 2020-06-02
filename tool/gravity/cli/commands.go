@@ -590,6 +590,8 @@ type UpdateTriggerCmd struct {
 	Manual *bool
 	// SkipVersionCheck suppresses version mismatch errors
 	SkipVersionCheck *bool
+	// DockerDevice updates Docker device in the cluster state to the provided one
+	DockerDevice *string
 }
 
 // UpdateUploadCmd uploads new app version to local cluster
@@ -644,6 +646,8 @@ type UpgradeCmd struct {
 	Resume *bool
 	// SkipVersionCheck suppresses version mismatch errors
 	SkipVersionCheck *bool
+	// DockerDevice updates Docker device in the cluster state to the provided one
+	DockerDevice *string
 }
 
 // StatusCmd combines subcommands for displaying status information
