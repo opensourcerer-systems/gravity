@@ -126,7 +126,7 @@ func NewOperationPlan(ctx context.Context, config PlanConfig) (*storage.Operatio
 		return nil, trace.Wrap(err)
 	}
 
-	servers, err = checkAndSetServerDefaults(servers, config.Client.CoreV1().Nodes(), config.DockerDevice)
+	servers, err = checkAndSetServerDefaults(servers, config.Client.CoreV1().Nodes())
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}
@@ -238,6 +238,7 @@ func NewOperationPlan(ctx context.Context, config PlanConfig) (*storage.Operatio
 		updateTeleport:             *updateTeleport,
 		installedDocker:            *installedDocker,
 		serviceUser:                config.Cluster.ServiceUser,
+		dockerDevice:               config.DockerDevice,
 	}
 
 	err = builder.initSteps(ctx)
@@ -301,7 +302,7 @@ type PlanConfig struct {
 	DockerDevice string
 }
 
-func checkAndSetServerDefaults(servers []storage.Server, client corev1.NodeInterface, dockerDevice string) ([]storage.Server, error) {
+func checkAndSetServerDefaults(servers []storage.Server, client corev1.NodeInterface) ([]storage.Server, error) {
 	nodes, err := utils.GetNodes(client)
 	if err != nil {
 		return nil, trace.Wrap(err)
@@ -311,10 +312,6 @@ func checkAndSetServerDefaults(servers []storage.Server, client corev1.NodeInter
 	// set cluster role that might have not have been set
 L:
 	for i, server := range servers {
-		if dockerDevice != "" {
-			servers[i].Docker.Device.Name = storage.DeviceName(dockerDevice)
-		}
-
 		if utils.StringInSlice(masterIPs, server.AdvertiseIP) {
 			servers[i].ClusterRole = string(schema.ServiceRoleMaster)
 		} else {

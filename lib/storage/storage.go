@@ -1849,6 +1849,8 @@ type DockerConfig struct {
 	StorageDriver string `json:"storage_driver,omitempty"`
 	// Args specifies additional options to the docker daemon
 	Args []string `json:"args,omitempty"`
+	// Device indicates a device to use
+	Device string `json:"device,omitempty"`
 }
 
 // Check makes sure the docker config is correct

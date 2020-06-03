@@ -186,6 +186,8 @@ type UpdateOperationData struct {
 	RuntimeAppVersion string `json:"version,omitempty"`
 	// GravityPackage specifies the optional gravity package for this phase
 	GravityPackage *loc.Locator `json:"gravity_package,omitempty"`
+	// DockerDevice is a Docker device path to use for devicemapper migration
+	DockerDevice string `json:"docker_device,omitempty"`
 }
 
 // UpdateServer describes an intent to update runtime/teleport configuration

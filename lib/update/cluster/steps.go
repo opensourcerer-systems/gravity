@@ -147,6 +147,7 @@ func (r phaseBuilder) buildIntermediateSteps(ctx context.Context) (updates []int
 		if err != nil {
 			return nil, trace.Wrap(err)
 		}
+		update.dockerDevice = r.dockerDevice
 		updates = append(updates, update)
 		prevRuntimeApp = update.runtimeApp
 		prevTeleport = update.teleport
@@ -730,7 +731,7 @@ func (r updateStep) etcdRestartPhase(server storage.Server) *builder.Phase {
 
 // dockerDevicePhase builds a phase that takes care of repurposing device used
 // by Docker devicemapper driver for overlay data.
-func dockerDevicePhase(node storage.UpdateServer) *builder.Phase {
+func (r updateStep) dockerDevicePhase(node storage.UpdateServer) *builder.Phase {
 	root := builder.NewPhase(storage.OperationPhase{
 		ID: "docker",
 		Description: fmt.Sprintf("Repurpose devicemapper device %v for overlay data",
@@ -746,6 +747,9 @@ func dockerDevicePhase(node storage.UpdateServer) *builder.Phase {
 				node.GetDockerDevice()),
 			Data: &storage.OperationPhaseData{
 				Server: &node.Server,
+				Update: &storage.UpdateOperationData{
+					DockerDevice: r.dockerDevice,
+				},
 			},
 		},
 		// Re-format the device to xfs or ext4.
@@ -755,6 +759,9 @@ func dockerDevicePhase(node storage.UpdateServer) *builder.Phase {
 			Description: fmt.Sprintf("Format %v", node.GetDockerDevice()),
 			Data: &storage.OperationPhaseData{
 				Server: &node.Server,
+				Update: &storage.UpdateOperationData{
+					DockerDevice: r.dockerDevice,
+				},
 			},
 		},
 		// Mount the device under Docker data directory.
@@ -765,6 +772,9 @@ func dockerDevicePhase(node storage.UpdateServer) *builder.Phase {
 				node.GetDockerDevice()),
 			Data: &storage.OperationPhaseData{
 				Server: &node.Server,
+				Update: &storage.UpdateOperationData{
+					DockerDevice: r.dockerDevice,
+				},
 			},
 		},
 		// Start the Planet unit and wait till it's up.
@@ -873,7 +883,7 @@ func (r updateStep) commonNode(server storage.UpdateServer, executor *storage.Se
 		}),
 	}
 	if server.ShouldMigrateDockerDevice() {
-		phases = append(phases, dockerDevicePhase(server))
+		phases = append(phases, r.dockerDevicePhase(server))
 	}
 	if r.supportsTaints {
 		phases = append(phases, builder.NewPhase(storage.OperationPhase{
@@ -961,6 +971,8 @@ type updateStep struct {
 	runtimeUpdates []loc.Locator
 	// supportsTaints specifies whether this runtime version supports node taints
 	supportsTaints bool
+	// dockerDevice is used for devicemapper migration to overlay
+	dockerDevice string
 }
 
 type etcdVersion struct {

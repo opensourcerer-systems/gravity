@@ -54,7 +54,7 @@ func NewDockerDevicemapper(p fsm.ExecutorParams, remote fsm.Remote, log logrus.F
 	return &dockerDevicemapper{
 		FieldLogger: log,
 		Node:        node,
-		Device:      node.Docker.Device.Path(),
+		Device:      getDockerDevice(p.Phase.Data),
 		Remote:      remote,
 	}, nil
 }
@@ -121,7 +121,7 @@ func NewDockerFormat(p fsm.ExecutorParams, remote fsm.Remote, log logrus.FieldLo
 	return &dockerFormat{
 		FieldLogger: log,
 		Node:        node,
-		Device:      node.Docker.Device.Path(),
+		Device:      getDockerDevice(p.Phase.Data),
 		Remote:      remote,
 	}, nil
 }
@@ -180,7 +180,7 @@ func NewDockerMount(p fsm.ExecutorParams, remote fsm.Remote, log logrus.FieldLog
 	return &dockerMount{
 		FieldLogger: log,
 		Node:        node,
-		Device:      node.Docker.Device.Path(),
+		Device:      getDockerDevice(p.Phase.Data),
 		Remote:      remote,
 	}, nil
 }
@@ -235,3 +235,11 @@ func (d *dockerMount) PreCheck(ctx context.Context) error {
 
 // PostCheck is no-op.
 func (*dockerMount) PostCheck(context.Context) error { return nil }
+
+// getDockerDevice extracts Docker device path from the operation phase data.
+func getDockerDevice(data *storage.OperationPhaseData) string {
+	if data.Update != nil && data.Update.DockerDevice != "" {
+		return data.Update.DockerDevice
+	}
+	return data.Server.Docker.Device.Path()
+}
