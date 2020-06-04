@@ -18,6 +18,7 @@ package phases
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -195,8 +196,12 @@ func (d *dockerMount) Execute(ctx context.Context) error {
 	if err != nil {
 		return trace.Wrap(err)
 	}
+	uuid, err := system.GetFilesystemUUID(ctx, d.Device, utils.Runner)
+	if err != nil {
+		return trace.Wrap(err)
+	}
 	config := mount.ServiceConfig{
-		What:       storage.DeviceName(d.Device),
+		What:       storage.DeviceName(fmt.Sprintf("/dev/disk/by-uuid/%v", uuid)),
 		Where:      filepath.Join(stateDir, defaults.PlanetDir, defaults.DockerDir),
 		Filesystem: filesystem,
 		Options:    []string{"defaults"},

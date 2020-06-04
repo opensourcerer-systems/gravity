@@ -125,7 +125,7 @@ func InitAndCheck(g *Application, cmd string) error {
 		g.UpdateTriggerCmd.FullCommand(),
 		g.UpdatePlanInitCmd.FullCommand(),
 		g.UpgradeCmd.FullCommand(),
-		g.RPCAgentRunCmd.FullCommand(),
+		//		g.RPCAgentRunCmd.FullCommand(),
 		g.LeaveCmd.FullCommand(),
 		g.RemoveCmd.FullCommand(),
 		g.ResourceCreateCmd.FullCommand(),
@@ -358,6 +358,7 @@ func Execute(g *Application, cmd string, extraArgs []string) error {
 			*g.UpdateTriggerCmd.DockerDevice,
 			*g.UpdateTriggerCmd.Manual,
 			*g.UpdateTriggerCmd.SkipVersionCheck,
+			*g.UpdateTriggerCmd.Force,
 		)
 	case g.UpdatePlanInitCmd.FullCommand():
 		updateEnv, err := g.NewUpdateEnv()
@@ -390,6 +391,7 @@ func Execute(g *Application, cmd string, extraArgs []string) error {
 			*g.UpgradeCmd.DockerDevice,
 			*g.UpgradeCmd.Manual,
 			*g.UpgradeCmd.SkipVersionCheck,
+			*g.UpgradeCmd.Force,
 		)
 	case g.PlanExecuteCmd.FullCommand():
 		return executePhase(localEnv, g,

@@ -211,8 +211,7 @@ func validateManifest(profile schema.NodeProfile, manifest schema.Manifest, dock
 }
 
 func validateDockerDevice(device string) (failed []*agentpb.Probe) {
-	_, err := devicemapper.GetDevice(device)
-	if err != nil {
+	if err := devicemapper.StatDevice(device); err != nil {
 		failed = append(failed, &agentpb.Probe{
 			Detail: fmt.Sprintf("failed to validate docker device %v", device),
 			Error:  trace.UserMessage(err),

@@ -592,6 +592,8 @@ type UpdateTriggerCmd struct {
 	SkipVersionCheck *bool
 	// DockerDevice updates Docker device in the cluster state to the provided one
 	DockerDevice *string
+	// Force bypasses some pre-upgrade checks
+	Force *bool
 }
 
 // UpdateUploadCmd uploads new app version to local cluster

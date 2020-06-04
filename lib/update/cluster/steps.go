@@ -78,6 +78,7 @@ func (r *phaseBuilder) initSteps(ctx context.Context) error {
 		etcd:           etcd,
 		gravity:        r.planTemplate.GravityPackage,
 		supportsTaints: supportsTaints(r.updateRuntimeAppVersion),
+		dockerDevice:   r.dockerDevice,
 	})
 	return nil
 }
@@ -732,10 +733,14 @@ func (r updateStep) etcdRestartPhase(server storage.Server) *builder.Phase {
 // dockerDevicePhase builds a phase that takes care of repurposing device used
 // by Docker devicemapper driver for overlay data.
 func (r updateStep) dockerDevicePhase(node storage.UpdateServer) *builder.Phase {
+	dockerDevice := r.dockerDevice
+	if dockerDevice == "" {
+		dockerDevice = node.GetDockerDevice()
+	}
 	root := builder.NewPhase(storage.OperationPhase{
 		ID: "docker",
 		Description: fmt.Sprintf("Repurpose devicemapper device %v for overlay data",
-			node.GetDockerDevice()),
+			dockerDevice),
 	})
 	phases := []storage.OperationPhase{
 		// Remove devicemapper environment (pv, vg, lv) from
@@ -744,11 +749,11 @@ func (r updateStep) dockerDevicePhase(node storage.UpdateServer) *builder.Phase 
 			ID:       "devicemapper",
 			Executor: dockerDevicemapper,
 			Description: fmt.Sprintf("Remove devicemapper environment from %v",
-				node.GetDockerDevice()),
+				dockerDevice),
 			Data: &storage.OperationPhaseData{
 				Server: &node.Server,
 				Update: &storage.UpdateOperationData{
-					DockerDevice: r.dockerDevice,
+					DockerDevice: dockerDevice,
 				},
 			},
 		},
@@ -756,11 +761,11 @@ func (r updateStep) dockerDevicePhase(node storage.UpdateServer) *builder.Phase 
 		{
 			ID:          "format",
 			Executor:    dockerFormat,
-			Description: fmt.Sprintf("Format %v", node.GetDockerDevice()),
+			Description: fmt.Sprintf("Format %v", dockerDevice),
 			Data: &storage.OperationPhaseData{
 				Server: &node.Server,
 				Update: &storage.UpdateOperationData{
-					DockerDevice: r.dockerDevice,
+					DockerDevice: dockerDevice,
 				},
 			},
 		},
@@ -769,11 +774,11 @@ func (r updateStep) dockerDevicePhase(node storage.UpdateServer) *builder.Phase 
 			ID:       "mount",
 			Executor: dockerMount,
 			Description: fmt.Sprintf("Create mount for %v",
-				node.GetDockerDevice()),
+				dockerDevice),
 			Data: &storage.OperationPhaseData{
 				Server: &node.Server,
 				Update: &storage.UpdateOperationData{
-					DockerDevice: r.dockerDevice,
+					DockerDevice: dockerDevice,
 				},
 			},
 		},

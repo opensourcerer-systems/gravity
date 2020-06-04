@@ -53,29 +53,15 @@ func GetDevices() (devices []storage.Device, err error) {
 	return devices, err
 }
 
-// GetDevice returns information about device at the specified path.
-func GetDevice(path string) (*storage.Device, error) {
-	out, err := exec.Command("lsblk", "--output=NAME,TYPE,SIZE,FSTYPE,PKNAME", "-P", "--bytes", path).Output()
+// StatDevice returns nil if the specified device exists and an error otherwise.
+func StatDevice(path string) error {
+	out, err := exec.Command("lsblk", path).Output()
 	if exitErr, ok := err.(*exec.ExitError); ok {
-		err = trace.Wrap(err, "lsblk error=%v, stderr=%q, out=%q", exitErr, exitErr.Stderr, out)
-		return nil, err
+		return trace.Wrap(err, "lsblk error=%v, stderr=%q, out=%q", exitErr, exitErr.Stderr, out)
 	} else if err != nil {
-		return nil, trace.Wrap(err, "failed to list block device: error=%v, output=%s", err, out)
+		return trace.Wrap(err, "failed to describe block device: error=%v, output=%s", err, out)
 	}
-	devices, err := parseDevices(bytes.NewReader(out))
-	if err != nil {
-		return nil, trace.Wrap(err, "error parsing block device list: lsblk=%q : error=%v", out, err)
-	}
-	if len(devices) != 1 {
-		return nil, trace.BadParameter("expected 1 device, got %v", devices)
-	}
-	device := devices[0]
-	// The passed device may be a symlink to block device so make sure to
-	// use the original passed in name so it can be found in the server
-	// state later, if for example a user uses --docker-device=/dev/xvdb
-	// where /dev/xvdb is a symlink to a real device file.
-	device.Name = storage.DeviceName(path)
-	return &device, nil
+	return nil
 }
 
 // Source: https://www.kernel.org/doc/Documentation/devices.txt
