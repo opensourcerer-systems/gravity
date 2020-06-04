@@ -298,7 +298,7 @@ type PlanConfig struct {
 	Leader *storage.Server
 	// Cluster describes the installed cluster
 	Cluster ops.Site
-	//
+	// DockerDevice specifies a device for devicemapper migration
 	DockerDevice string
 }
 

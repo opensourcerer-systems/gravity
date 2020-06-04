@@ -236,8 +236,8 @@ func (r *clusterInitializer) checkDockerDevice(cluster ops.Site) error {
 	// The check is only relevant when upgrading from devicemapper to overlay.
 	//
 	// It should be sufficient to just check the current cluster storage driver:
-	// devicemapper has been deprecated in 5.3.4 so any upgrade to this version
-	// will change it to overlay.
+	// devicemapper was deprecated in 5.3.4 so any upgrade to this version will
+	// change it to overlay.
 	if cluster.ClusterState.Docker.StorageDriver != constants.DockerStorageDriverDevicemapper {
 		return nil
 	}
@@ -274,7 +274,7 @@ For example, if "/dev/xvdb" is guaranteed to point to the correct NVMe device:
 
 $ sudo ./gravity upgrade --docker-device=/dev/xvdb
 
-Note that the symlink name should be the same on all cluster nodes.
+Note that the symlink name is assumed to be the same on all cluster nodes.
 
 You can provide a --force flag to override this check, in which case the upgrade
 operation will use device names displayed in the table above.
