@@ -24,7 +24,6 @@ require (
 	github.com/buger/goterm v0.0.0-20140416104154-af3f07dadc88
 	github.com/cenkalti/backoff v1.1.0
 	github.com/chai2010/gettext-go v0.0.0-20170215093142-bf70f2a70fb1 // indirect
-	github.com/client9/misspell v0.3.4 // indirect
 	github.com/cloudflare/cfssl v0.0.0-20180726162950-56268a613adf
 	github.com/cloudfoundry/gosigar v0.0.0-20170815193638-f4030c18ce1a
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd
@@ -144,7 +143,6 @@ require (
 	github.com/ziutek/mymysql v1.5.4 // indirect
 	go.mongodb.org/mongo-driver v1.0.4 // indirect
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
-	golang.org/x/lint v0.0.0-20190313153728-d0100b6bd8b3 // indirect
 	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
 	golang.org/x/sys v0.0.0-20191115151921-52ab43148777
@@ -156,7 +154,6 @@ require (
 	gopkg.in/mgo.v2 v2.0.0-20160818020120-3f83fa500528 // indirect
 	gopkg.in/square/go-jose.v2 v2.2.0 // indirect
 	gopkg.in/yaml.v2 v2.2.8
-	honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc // indirect
 	k8s.io/api v0.17.6
 	k8s.io/apiextensions-apiserver v0.0.0
 	k8s.io/apimachinery v0.17.6
